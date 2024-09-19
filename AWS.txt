@@ -1,0 +1,294 @@
+Host :
+ec2-13-60-12-70.eu-north-1.compute.amazonaws.com
+login as: ec2-user
+
+
+Amazon Application deployment
+1) Create an instance of the server , We can choose ami like windows, linus , ubuntu, reddhat etc
+2) in operating system , wehave default 8 gib memory , status, different instance, networking,monitering tabs
+3) We create key value pair which will help us login to system, we generate key 
+4) wedownload the key, now with help of putty gen , we generate the key
+5) we connect to ec2 instance, after that we get the host name
+6) we use putty to connect to aws machine, in the host name we give the hostname shown in amazon ec2, and then in the authentication, we add the key which we generated with help of putty gen
+7) Putty now opens for that ami
+login as: ec2-user
+->Download the java latest version commad
+sudo yum install -y java-11-openjdk-devel
+
+8) We create S3 bucket for storage, in taht we upload our jar.
+9) Get the jar in the current machine ami
+wget https://aws-demo-krr-bucket.s3.eu-north-1.amazonaws.com/Spring-Boot-AWSc-exec.jar
+
+10) To run the jar 
+java -jar Spring-Boot-AWSc-exec.jar
+
+11) Open Public IPv4 DNS from amazon ec2
+use the url:port to launch in browser
+-----------------------------------------
+
+Dynamo DB :
+Database which maintain data in documented format.
+Its size is dynamic , based on the data it will scale up automatically, no need to scale manually
+
+Partition KEy : Partiona key is the partition key , also called as hash key
+->We have deafault capactity , scaling, reading writing capacity, which are customizable
+
+
+-->If we need to create database , we create new table under dynamo db.
+
+-->create group
+-->create user
+-->manage user access-->IAM (Attach user with password and manage the user name password configuration)
+Console Url:
+https://418272793061.signin.aws.amazon.com/console
+
+UserName: javaTechie-admin
+Password: lj^%S2m(
+
+
+-->Create policy and attach with the group
+
+
+--->Create APPLIcation with dynamo DB databse
+-->Get the Jar for application
+
+---------------------------------------------------
+
+Elastic Bean Stalk (Instead of s3 we can use this)\
+1)create application
+2)select platform(java/tomcat/go/php/python)
+3) upload the application jar
+iT WILl create amazon ec2 instance and it will use s3 storage
+4)We can select EC2 key pair here as well
+5) We can also integrate teh RDS sql database as well in this
+6) We can add loadbalancing, monitering (for 1 min/5 min), Volumne of storage, u can select availability zone
+7)You can have custom matric like how based on number of application request or latency
+8)we can manage platform update and their time when we want then to update
+9) We can have deployment in part like 80:20
+
+-------------------------------------------------------
+
+RDS :
+
+dbname : javatechie
+username: root
+password: awspassword
+port: 3306
+
+we can connect workbench on the RDS host url 
+-->in workbench ->new connection ->aws url +aws password
+->we can access the data we deployed 
+-->to run and deploy we use the EBS 
+->create application in ebs upload the code to ebs and add db connection as well in that(provide my sql user name /password)
+-> upload and deploy the code
+->take the url and use in postman if post or get from browsser
+------------------------------------------------------------------------
+
+AWS Secret Manager :
+In this you can moniterer and control access to multiple microservices together with password managenwbt
+application directly consume from ssecret manager, we dont need to configure it
+-secret if changed,no need to update env varibale or properties files
+
+---------->
+We remove the username password from the application.yml and we create aws secre key and secert password from aws
+->Go to secert manager
+give username
+password
+->
+===================================================================
+ELK Stack or eLASTIC Stack:
+https://www.youtube.com/watch?v=5s9pR9UUtAU&ab_channel=JavaTechie
+
+Elastic Search + logstash + kIBANA
+its used for centralized logging in microservices architecture
+
+1)elastic search :
+its no sql database
+
+2)logstash
+it log pipeline tool which takes input/log from various sources adn export data to various source
+
+3) Kibana:
+Visualization UI layer, which help developer to moniter application logs
+
+IT WOrkds to store(es), process(logstash) and view the data(Kibana)
+ 
+
+1)Its highly scable
+===========>
+Elk Execution steps:
+->Donwload E L adn K
+1)IN elastic searchconfig->yml 
+# Enable security features
+Disbale the features
+Start elastic search batch file in bin location
+C:\Users\Lenovo\ELK Stack\elasticsearch-8.15.1\bin
+2) Start Kibana
+Uncomment bleow host because kibana need to be told where elastic search is up and running
+elasticsearch.hosts: ["http://localhost:9200"]
+
+-->Start elastic search first then kibana 
+http://localhost:9200/ -->Elastic search
+http://localhost:5601/-->kIbana
+-------------------------------
+
+
+SpringbOot app-->created log from Logger ->PLace the logs to file in logstash -> in logstash.yml give the path pf the file placed on the desktop for log
+and from log we need to sent to elastic search db so the address of that
+below is example of logstash.conf
+--------------
+input { 
+  file {
+    path => "C:/Users/Lenovo/Desktop/logs/ElkStack.logs"
+    start_position => "beginning"
+  }
+}
+
+output {
+  stdout {
+    codec => rubydebug
+  }
+  elasticsearch {
+    hosts => ["localhost:9200"]
+  }
+}
+----------------------------------------------------------------------
+How to use ELK FOR Logging
+----------------------------------------------------------------------
+To refine the use of the ELK (Elasticsearch, Logstash, Kibana) stack, here's an improved approach for setting up and visualizing logs from an API using Elasticsearch and Kibana:
+
+1) (Take the log from file path and logstash and places it on elastic searh db)
+2) elastic search db.yml take the path of kibana and pushes the logs to kibana
+
+### 1. **Start Elasticsearch:** 
+   - Elasticsearch is the core of the ELK stack, where all data is stored and indexed.
+   - Run Elasticsearch using the command:
+     ```bash
+     ./bin/elasticsearch
+     ```
+   - Ensure that Elasticsearch is running on the default port `9200` by checking:
+     ```
+     http://localhost:9200
+     ```
+
+### 2. **Start Kibana:**
+   - Kibana is the visualization layer of the stack, allowing you to query and visualize data stored in Elasticsearch.
+   - Start Kibana using:
+     ```bash
+     ./bin/kibana
+     ```
+   - Verify that Kibana is accessible via its default port `5601`:
+     ```
+     http://localhost:5601
+     ```
+
+### 3. **API Integration:**
+   - After setting up Elasticsearch and Kibana, send logs from your API to Elasticsearch. You can configure your API or application to use **Logstash** or an Elasticsearch client library to send logs to Elasticsearch.
+   - Example: If you’re using Logstash to capture logs from an API, your Logstash configuration (`logstash.conf`) might look like this:
+     ```plaintext
+     input {
+         http {
+             port => 5044
+         }
+     }
+
+     output {
+         elasticsearch {
+             hosts => ["localhost:9200"]
+             index => "api-logs-%{+YYYY.MM.dd}"
+         }
+         stdout { codec => rubydebug }
+     }
+     ```
+   - This configuration will listen for incoming logs on port `5044` and send them to Elasticsearch under the index `api-logs-<date>`.
+
+### 4. **Verify Logs in Elasticsearch:**
+   - To see the logs and indexes in Elasticsearch, you can use the `_cat/indices` API to list the indices and verify the data:
+     ```bash
+     curl -X GET "localhost:9200/_cat/indices?v"
+     ```
+   - This will display all the indices present in Elasticsearch, including the logs coming from your API.
+
+### 5. **View Logs in Kibana:**
+   - In Kibana, go to **Management** > **Index Patterns** and create a new index pattern (e.g., `api-logs-*`).
+   - This will allow Kibana to recognize the index and enable you to visualize the logs.
+   - Go to **Discover** in Kibana to query and view your logs.
+
+### 6. **Advanced Querying and Visualization:**
+   - In the **Discover** tab, you can query your logs using the **Lucene** or **KQL** query language.
+   - You can also create custom dashboards under **Dashboard** to visualize metrics and patterns from your API logs in real-time.
+
+### Summary:
+- **Start Elasticsearch** and ensure it’s running.
+- **Start Kibana** and confirm access to the dashboard.
+- **Send API logs to Elasticsearch** (directly or via Logstash).
+- Use `_cat/indices` to check logs in Elasticsearch.
+- **Create index patterns** in Kibana to visualize logs.
+------------------------------------------------------------------------------------------------------------------------
+
+							AWS Lambda
+
+------------------------------------------------------------------------------------------------------------------------
+
+Lambda:
+tradiotionally deploy application as war/jar to EBS/Tomcat
+if we have contenerized platform ->create docker image ->deploy to Kubernetes
+-->in case of seasonal high request-> if we have allocated only one server , it will not be able to scale up /down
+->if we deploy app to aws lambda , it autpmatillay scale up/down based on the demand
+
+Advantage:
+No need to maintain the server
+-> only pay when you are executing the code
+->based on the requirement scale up/down
+
+We can create jar and deploy to aws, you create lambda function on aws ->
+2)specify THE JAVA VERSION in lambda function
+3)upload your zip or jar file to function and deploy
+4)Test teh code by updating with json with request url 
+5) Or u can test it by using api gatway 
+6)create api gateway ->select rest api(we create our endpoint of api gateway)
+7)create resource with  any resource name --/{proxy+} (it allows all endpoints)
+8)create method (method type (Any/get/post), select lanmbda qith which u want to use method
+9) deploy and give the stage u want to deploy like dev/prod
+10) u will see stages are created , use teh root level url to acces the endpoints on postman
+
+->
+------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
